@@ -13,6 +13,17 @@ import model.TaskRepository
 import java.util.Collections
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * Installs WebSockets and exposes task-related WS endpoints.
+ *
+ * Endpoints:
+ * - WS `/tasks` → streams all tasks once then closes with NORMAL reason.
+ * - WS `/tasks2` →
+ *   - on connect: streams all tasks;
+ *   - then accepts `Task` JSON frames to add new tasks and broadcasts them to all connected sessions.
+ *
+ * Messages are serialized with Kotlinx (JSON).
+ */
 fun Application.configureSockets(taskRepository: TaskRepository) {
     install(WebSockets) {
         contentConverter = KotlinxWebsocketSerializationConverter(Json)
@@ -51,6 +62,9 @@ fun Application.configureSockets(taskRepository: TaskRepository) {
     }
 }
 
+/**
+ * Sends every task to the current WebSocket session with a small delay between frames.
+ */
 private suspend fun DefaultWebSocketServerSession.sendAllTasks(taskRepository: TaskRepository) {
     for (task in taskRepository.allTasks()) {
         sendSerialized(task)

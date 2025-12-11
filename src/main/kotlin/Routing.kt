@@ -11,6 +11,13 @@ import io.ktor.websocket.*
 import java.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * Configures plain HTTP routing.
+ *
+ * Endpoints:
+ * - GET `/` → returns "Hello World!"
+ * - Static resources under `/static` → serves files from `resources/static`.
+ */
 fun Application.configureRouting() {
     routing {
         get("/") {

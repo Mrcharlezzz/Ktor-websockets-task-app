@@ -8,6 +8,13 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.transaction
 
+/**
+ * Configures the SQLite database and ensures the schema exists.
+ *
+ * - Connects to `./data/tasks.db` using the SQLite JDBC driver.
+ * - Creates the `task` table if missing.
+ * - Seeds example tasks when the table is empty.
+ */
 fun Application.configureDatabases() {
     Database.connect(
         url = "jdbc:sqlite:./data/tasks.db",
@@ -23,6 +30,9 @@ fun Application.configureDatabases() {
     }
 }
 
+/**
+ * Inserts a small set of sample tasks.
+ */
 private fun seedTasks() {
     val tasks = listOf(
         Triple("cleaning",   "Clean the house",          "Low"),

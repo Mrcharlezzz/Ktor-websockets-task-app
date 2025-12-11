@@ -11,6 +11,12 @@ import io.ktor.websocket.*
 import java.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * Installs JSON serialization and exposes a simple sample endpoint.
+ *
+ * Endpoints:
+ * - GET `/json/kotlinx-serialization` → `{ "hello": "world" }`.
+ */
 fun Application.configureSerialization() {
     install(ContentNegotiation) {
         json()

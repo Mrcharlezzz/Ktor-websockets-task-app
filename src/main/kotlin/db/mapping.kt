@@ -10,12 +10,18 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
+/**
+ * Exposed table for persisting tasks.
+ */
 object TaskTable : IntIdTable("task") {
     val name = varchar("name", 50)
     val description = varchar("description", 50)
     val priority = varchar("priority", 50)
 }
 
+/**
+ * Exposed entity for the `task` table (example entity, not used directly).
+ */
 class TaskEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<TaskEntity>(TaskTable)
 
@@ -24,6 +30,9 @@ class TaskEntity(id: EntityID<Int>) : IntEntity(id) {
     var priority by TaskTable.priority
 }
 
+/**
+ * Exposed DAO used by the repository layer.
+ */
 class TaskDAO(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<TaskDAO>(TaskTable)
 
@@ -32,9 +41,15 @@ class TaskDAO(id: EntityID<Int>) : IntEntity(id) {
     var priority by TaskTable.priority
 }
 
+/**
+ * Runs an Exposed transaction on `Dispatchers.IO` and returns the block result.
+ */
 suspend fun <T> suspendTransaction(block: Transaction.() -> T): T =
     newSuspendedTransaction(Dispatchers.IO, statement = block)
 
+/**
+ * Maps a [TaskDAO] to a serializable [Task] model.
+ */
 fun daoToModel(dao: TaskDAO) = Task(
     dao.name,
     dao.description,
