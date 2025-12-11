@@ -31,6 +31,14 @@ Responding at http://0.0.0.0:8080
 }
 ```
 
+## Main page (WebSocket client)
+
+Open the in-browser client at:
+
+- http://localhost:8080/static/wsClient.html
+
+This is the primary page to interact with the server (send and observe WebSocket messages). The endpoints listed below are documented for reference, but typical usage is via this client page rather than calling the endpoints directly.
+
 ## Endpoints
 
 HTTP
