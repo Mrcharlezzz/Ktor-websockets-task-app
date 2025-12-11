@@ -21,9 +21,9 @@ import kotlin.time.Duration.Companion.seconds
 fun Application.configureRouting() {
     routing {
         get("/") {
-            call.respondText("Hello World!")
+            call.respondText("Healthy")
         }
-        // Static plugin. Try to access `/static/index.html`
+        // Static plugin. Try Access `/static/wsClient.html`
         staticResources("/static", "static")
     }
 }
