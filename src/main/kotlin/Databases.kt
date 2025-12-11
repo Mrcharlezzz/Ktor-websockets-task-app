@@ -1,0 +1,43 @@
+package com.example
+
+import com.example.db.TaskDAO
+import com.example.db.TaskTable
+import io.ktor.server.application.Application
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.Transaction
+import org.jetbrains.exposed.sql.transactions.transaction
+
+fun Application.configureDatabases() {
+    Database.connect(
+        url = "jdbc:sqlite:./data/tasks.db",
+        driver = "org.sqlite.JDBC"
+    )
+
+    transaction {
+        // Create the table if it doesn't exist
+        SchemaUtils.create(TaskTable)
+
+        // Seed initial data only when the table is empty
+        seedTasks()
+    }
+}
+
+private fun seedTasks() {
+    val tasks = listOf(
+        Triple("cleaning",   "Clean the house",          "Low"),
+        Triple("gardening",  "Mow the lawn",             "Medium"),
+        Triple("shopping",   "Buy the groceries",        "High"),
+        Triple("painting",   "Paint the fence",          "Medium"),
+        Triple("exercising", "Walk the dog",             "Medium"),
+        Triple("meditating", "Contemplate the infinite", "High")
+    )
+
+    tasks.forEach { (name, description, priority) ->
+        TaskDAO.new {
+            this.name = name
+            this.description = description
+            this.priority = priority
+        }
+    }
+}

@@ -1,6 +1,6 @@
 package model
 
-interface TaskRepo{
+interface TaskRepository{
     suspend fun allTasks(): List<Task>
     suspend fun tasksByPriority(priority: Priority): List<Task>
     suspend fun taskByName(name: String): Task?

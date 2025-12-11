@@ -1,9 +1,6 @@
 package model
 
-import model.Priority
-import model.Task
-
-object TaskRepository : TaskRepo{
+class RawTaskRepository : TaskRepository{
     private val tasks = mutableListOf(
         Task("cleaning", "Clean the house", Priority.Low),
         Task("gardening", "Mow the lawn", Priority.Medium),

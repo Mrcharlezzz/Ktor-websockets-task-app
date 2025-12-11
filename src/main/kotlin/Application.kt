@@ -1,15 +1,17 @@
 package com.example
 
+import com.example.model.SqliteTaskRepository
 import io.ktor.server.application.*
-import model.TaskRepo
-import model.TaskRepository
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
 }
 
 fun Application.module() {
-    configureSockets()
+
+    val repository = SqliteTaskRepository()
+    configureDatabases()
+    configureSockets(repository)
     configureSerialization()
     configureRouting()
 }
