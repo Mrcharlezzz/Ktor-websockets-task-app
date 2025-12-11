@@ -1,43 +1,70 @@
-# ktor-websockets-task-app
+# Ktor WebSockets Task App
 
-This project was created using the [Ktor Project Generator](https://start.ktor.io).
+Simple Ktor backend showcasing HTTP routes, JSON serialization, WebSockets, and SQLite persistence with Exposed.
 
-Here are some useful links to get you started:
+## Tech stack
+- Ktor (Netty engine)
+- WebSockets + kotlinx.serialization (JSON)
+- SQLite database at `./data/tasks.db`
+- Exposed DAO for persistence
 
-- [Ktor Documentation](https://ktor.io/docs/home.html)
-- [Ktor GitHub page](https://github.com/ktorio/ktor)
-- The [Ktor Slack chat](https://app.slack.com/client/T09229ZC6/C0A974TJ9). You'll need to [request an invite](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up) to join.
+## Run locally
+Default port: `8080` (see `src/main/resources/application.yaml`).
 
-## Features
+Commands:
+- `./gradlew run` — start the server
+- `./gradlew test` — run tests
+- `./gradlew build` — assemble
 
-Here's a list of features included in this project:
-
-| Name                                                                   | Description                                                                        |
-| ------------------------------------------------------------------------|------------------------------------------------------------------------------------ |
-| [Routing](https://start.ktor.io/p/routing)                             | Provides a structured routing DSL                                                  |
-| [WebSockets](https://start.ktor.io/p/ktor-websockets)                  | Adds WebSocket protocol support for bidirectional client connections               |
-| [Static Content](https://start.ktor.io/p/static-content)               | Serves static files from defined locations                                         |
-| [Content Negotiation](https://start.ktor.io/p/content-negotiation)     | Provides automatic content conversion according to Content-Type and Accept headers |
-| [kotlinx.serialization](https://start.ktor.io/p/kotlinx-serialization) | Handles JSON serialization using kotlinx.serialization library                     |
-
-## Building & Running
-
-To build or run the project, use one of the following tasks:
-
-| Task                                    | Description                                                          |
-| -----------------------------------------|---------------------------------------------------------------------- |
-| `./gradlew test`                        | Run the tests                                                        |
-| `./gradlew build`                       | Build everything                                                     |
-| `./gradlew buildFatJar`                 | Build an executable JAR of the server with all dependencies included |
-| `./gradlew buildImage`                  | Build the docker image to use with the fat JAR                       |
-| `./gradlew publishImageToLocalRegistry` | Publish the docker image locally                                     |
-| `./gradlew run`                         | Run the server                                                       |
-| `./gradlew runDocker`                   | Run using the local docker image                                     |
-
-If the server starts successfully, you'll see the following output:
-
+When started you should see a line like:
 ```
-2024-12-04 14:32:45.584 [main] INFO  Application - Application started in 0.303 seconds.
-2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
+Responding at http://0.0.0.0:8080
 ```
+
+## Data model
+`Task` (JSON):
+```
+{
+  "name": "shopping",
+  "description": "Buy the groceries",
+  "priority": "High" // one of: Low, Medium, High, Vital
+}
+```
+
+## Endpoints
+
+HTTP
+- GET `/` — health/sample endpoint; returns plain text "Healthy".
+- Static files under `/static/**` — served from `src/main/resources/static/`.
+
+WebSockets (JSON messages)
+- WS `/tasks` — on connect, streams all tasks (as `Task` JSON frames) once, then closes.
+- WS `/tasks2` — on connect, streams all tasks; then:
+  - receive: accepts `Task` JSON frames to add new tasks to the DB
+  - broadcast: relays each new task to all connected sessions
+
+### Curl examples
+- Hello world
+```
+curl -i http://localhost:8080/
+```
+
+### WebSocket examples
+Using websocat:
+```
+# Stream all tasks once
+websocat ws://localhost:8080/tasks
+
+# Interactive stream + publish new tasks
+websocat -t ws://localhost:8080/tasks2
+{"name":"painting","description":"Paint the fence","priority":"Medium"}
+```
+
+## Notes
+- On first start, the DB schema is created and a few sample tasks are seeded.
+- See:
+  - `Application.kt` for module wiring
+  - `Routing.kt` for HTTP routes
+  - `Sockets.kt` for WS behavior
+  - `Databases.kt` and `db/mapping.kt` for DB configuration and Exposed models
 
